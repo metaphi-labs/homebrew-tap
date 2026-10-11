@@ -1,0 +1,69 @@
+name: formula
+# Formula/metaphi.rb follows the latest release of metaphi-labs/metaphi-ai-cli: its binaries and their checksums.
+# Read from the public release, written with this repository's own token, so no other repository holds a key here.
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: formula
+jobs:
+  formula:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: write the formula
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(gh release view --repo metaphi-labs/metaphi-ai-cli --json tagName -q .tagName)
+          v=${tag#v}
+          gh release download "$tag" --repo metaphi-labs/metaphi-ai-cli --pattern checksums.txt --clobber
+          sha() { grep "_$1.tar.gz" checksums.txt | cut -d' ' -f1; }
+          url="https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/$tag/metaphi_${v}"
+          cat > Formula/metaphi.rb <<RB
+          class Metaphi < Formula
+            desc "The Metaphi AI command line"
+            homepage "https://docs.metaphi.ai"
+            version "$v"
+            license "Apache-2.0"
+
+            on_macos do
+              on_arm do
+                url "${url}_darwin-arm64.tar.gz"
+                sha256 "$(sha darwin-arm64)"
+              end
+              on_intel do
+                url "${url}_darwin-x86_64.tar.gz"
+                sha256 "$(sha darwin-x86_64)"
+              end
+            end
+
+            on_linux do
+              on_arm do
+                url "${url}_linux-arm64.tar.gz"
+                sha256 "$(sha linux-arm64)"
+              end
+              on_intel do
+                url "${url}_linux-x86_64.tar.gz"
+                sha256 "$(sha linux-x86_64)"
+              end
+            end
+
+            def install
+              bin.install "metaphi"
+            end
+
+            test do
+              assert_match version.to_s, shell_output("#{bin}/metaphi --version")
+            end
+          end
+          RB
+          rm checksums.txt
+      - name: commit when it changed
+        run: |
+          git diff --quiet && git ls-files --error-unmatch Formula/metaphi.rb >/dev/null 2>&1 && exit 0
+          git config user.name "metaphi-release" && git config user.email "agent@metaphi.ai"
+          git add Formula/metaphi.rb && git commit -m "metaphi $(grep -m1 'version "' Formula/metaphi.rb | cut -d'"' -f2)" && git push
