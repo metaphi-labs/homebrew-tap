@@ -1,69 +1,71 @@
 name: formula
 # Formula/metaphi.rb follows the latest release of metaphi-labs/metaphi-ai-cli: its binaries and their checksums.
 # Read from the public release, written with this repository's own token, so no other repository holds a key here.
+# scripts/formula.py validates the tag and every checksum and fills a fixed template; the tarballs must match
+# checksums.txt and, from 0.1.2 on, carry a build provenance attestation from the CLI's release workflow.
 on:
   schedule:
     - cron: "*/15 * * * *"
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: formula
 jobs:
   formula:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # commit the formula
+      attestations: read # gh attestation verify
     steps:
-      - uses: actions/checkout@v5
-      - name: write the formula
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: true # zizmor: ignore[artipacked] the job pushes the formula and uploads no artifacts
+      - name: the latest release
+        id: release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           tag=$(gh release view --repo metaphi-labs/metaphi-ai-cli --json tagName -q .tagName)
-          v=${tag#v}
-          gh release download "$tag" --repo metaphi-labs/metaphi-ai-cli --pattern checksums.txt --clobber
-          sha() { grep "_$1.tar.gz" checksums.txt | cut -d' ' -f1; }
-          url="https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/$tag/metaphi_${v}"
-          cat > Formula/metaphi.rb <<RB
-          class Metaphi < Formula
-            desc "The Metaphi AI command line"
-            homepage "https://docs.metaphi.ai"
-            version "$v"
-            license "Apache-2.0"
-
-            on_macos do
-              on_arm do
-                url "${url}_darwin-arm64.tar.gz"
-                sha256 "$(sha darwin-arm64)"
-              end
-              on_intel do
-                url "${url}_darwin-x86_64.tar.gz"
-                sha256 "$(sha darwin-x86_64)"
-              end
-            end
-
-            on_linux do
-              on_arm do
-                url "${url}_linux-arm64.tar.gz"
-                sha256 "$(sha linux-arm64)"
-              end
-              on_intel do
-                url "${url}_linux-x86_64.tar.gz"
-                sha256 "$(sha linux-x86_64)"
-              end
-            end
-
-            def install
-              bin.install "metaphi"
-            end
-
-            test do
-              assert_match version.to_s, shell_output("#{bin}/metaphi --version")
-            end
-          end
-          RB
-          rm checksums.txt
-      - name: commit when it changed
+          if ! printf '%s' "$tag" | grep -qxE 'v[0-9]+\.[0-9]+\.[0-9]+'; then
+            echo "::error::latest release tag is not vX.Y.Z"; exit 1
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if grep -qxF "  version \"${tag#v}\"" Formula/metaphi.rb && git diff --quiet; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: download and verify the release
+        if: steps.release.outputs.current != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
         run: |
-          git diff --quiet && git ls-files --error-unmatch Formula/metaphi.rb >/dev/null 2>&1 && exit 0
+          v=${TAG#v}
+          dir=$(mktemp -d) && echo "RELEASE_DIR=$dir" >> "$GITHUB_ENV"
+          gh release download "$TAG" --repo metaphi-labs/metaphi-ai-cli --dir "$dir" \
+            --pattern checksums.txt --pattern "metaphi_${v}_*.tar.gz"
+          for p in darwin-arm64 darwin-x86_64 linux-arm64 linux-x86_64; do
+            test -f "$dir/metaphi_${v}_${p}.tar.gz" || { echo "::error::release $TAG has no $p tarball"; exit 1; }
+          done
+          (cd "$dir" && sha256sum --check --strict checksums.txt)
+          # 0.1.1 and earlier were released before the CLI attested its builds.
+          if [ "$(printf '%s\n' 0.1.1 "$v" | sort -V | tail -1)" != 0.1.1 ]; then
+            for f in "$dir"/checksums.txt "$dir"/metaphi_"${v}"_*.tar.gz; do
+              gh attestation verify "$f" --repo metaphi-labs/metaphi-ai-cli \
+                --signer-workflow metaphi-labs/metaphi-ai-cli/.github/workflows/release.yml \
+                --source-ref "refs/tags/$TAG"
+            done
+          else
+            echo "::notice::$TAG predates build attestations; checked against checksums.txt only"
+          fi
+      - name: write the formula
+        if: steps.release.outputs.current != 'true'
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+        run: python3 scripts/formula.py "$TAG" "$RELEASE_DIR/checksums.txt" Formula/metaphi.rb
+      - name: commit when it changed
+        if: steps.release.outputs.current != 'true'
+        run: |
+          git diff --quiet && exit 0
           git config user.name "metaphi-release" && git config user.email "agent@metaphi.ai"
           git add Formula/metaphi.rb && git commit -m "metaphi $(grep -m1 'version "' Formula/metaphi.rb | cut -d'"' -f2)" && git push
