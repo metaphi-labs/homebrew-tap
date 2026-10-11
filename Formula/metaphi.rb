@@ -5,23 +5,23 @@ class Metaphi < Formula
 
   on_macos do
     on_arm do
-      url "https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/v0.1.3/metaphi_0.1.3_darwin-arm64.tar.gz"
-      sha256 "b213327679d8b2dc12685c2bd61f6c02af862414fd782e5e04ea0ffdcb4ca559"
+      url "https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/v0.1.4/metaphi_0.1.4_darwin-arm64.tar.gz"
+      sha256 "c8857d9649f126d722f5f33e3818329cc582c4f8eb2d622a13e7a4899e2f35de"
     end
     on_intel do
-      url "https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/v0.1.3/metaphi_0.1.3_darwin-x86_64.tar.gz"
-      sha256 "713de324c96f329f45e1f5544dafb0b1c01e09070d2adeed99d6dd46123a3fce"
+      url "https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/v0.1.4/metaphi_0.1.4_darwin-x86_64.tar.gz"
+      sha256 "43fc732b6b0c72442282b2a5da5057cf9c440cbcad112f8156c57ed26b052dd7"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/v0.1.3/metaphi_0.1.3_linux-arm64.tar.gz"
-      sha256 "d61bf063c639d5f4290adbfe086e410ba840a5e0e16f5b970d69e7aec9639464"
+      url "https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/v0.1.4/metaphi_0.1.4_linux-arm64.tar.gz"
+      sha256 "a8dac23e0a7d35b4227ce773a1e0d8c6af19d174a12ef55d751ce125ddd71c30"
     end
     on_intel do
-      url "https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/v0.1.3/metaphi_0.1.3_linux-x86_64.tar.gz"
-      sha256 "607fc04f6a9726a4caffdc12e6e399f0bccbcf28c15c3a754bf89595886d79f8"
+      url "https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/v0.1.4/metaphi_0.1.4_linux-x86_64.tar.gz"
+      sha256 "17659e670e66d3443db005418ac5c4731ab729490fdbfca8cd821e38fb9bb8b4"
     end
   end
 
