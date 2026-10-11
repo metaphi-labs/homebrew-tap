@@ -1,7 +1,6 @@
 class Metaphi < Formula
-  desc "The Metaphi AI command line"
+  desc "Command-line interface for Metaphi AI"
   homepage "https://docs.metaphi.ai"
-  version "0.1.1"
   license "Apache-2.0"
 
   on_macos do
