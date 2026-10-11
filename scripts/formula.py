@@ -19,7 +19,6 @@ SHA = re.compile(r"[0-9a-f]{64}")
 TEMPLATE = '''class Metaphi < Formula
   desc "Command-line interface for Metaphi AI"
   homepage "https://docs.metaphi.ai"
-  version "@VERSION@"
   license "Apache-2.0"
 
   on_macos do
@@ -92,8 +91,7 @@ def checksums(text: str, version: str) -> dict[str, str]:
 def render(tag: str, checksums_text: str) -> str:
     version = version_of(tag)
     shas = checksums(checksums_text, version)
-    out = TEMPLATE.replace("@VERSION@", version)
-    out = out.replace("@URL@", f"https://github.com/{REPO}/releases/download/{tag}/metaphi_{version}")
+    out = TEMPLATE.replace("@URL@", f"https://github.com/{REPO}/releases/download/{tag}/metaphi_{version}")
     for platform, sha in shas.items():
         out = out.replace(f"@SHA_{platform}@", sha)
     if "@" in out.replace("#{bin}", ""):

@@ -17,7 +17,6 @@ def sums(version="1.2.3", shas=None, extra=""):
 class Render(unittest.TestCase):
     def test_a_good_release_renders_every_platform(self):
         rb = formula.render("v1.2.3", sums())
-        self.assertIn('version "1.2.3"', rb)
         for p, s in SHAS.items():
             self.assertIn(f"/releases/download/v1.2.3/metaphi_1.2.3_{p}.tar.gz", rb)
             self.assertIn(f'sha256 "{s}"', rb)
@@ -53,7 +52,7 @@ class Render(unittest.TestCase):
 
     def test_the_committed_formula_is_what_the_script_writes(self):
         rb = (Path(__file__).resolve().parents[1] / "Formula" / "metaphi.rb").read_text()
-        self.assertTrue(rb.startswith(formula.TEMPLATE.split("@VERSION@")[0]))
+        self.assertTrue(rb.startswith(formula.TEMPLATE.split("@URL@")[0]))
 
 
 if __name__ == "__main__":
