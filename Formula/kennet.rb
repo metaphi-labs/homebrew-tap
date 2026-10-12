@@ -1,5 +1,5 @@
-class Metaphi < Formula
-  desc "Command-line interface for Metaphi AI"
+class Kennet < Formula
+  desc "Command-line interface for Kennet, the RL infrastructure of Metaphi AI"
   homepage "https://docs.metaphi.ai"
   license "Apache-2.0"
 
@@ -26,10 +26,10 @@ class Metaphi < Formula
   end
 
   def install
-    bin.install "metaphi"
+    bin.install "metaphi" => "kennet"
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/metaphi --version")
+    assert_match version.to_s, shell_output("#{bin}/kennet --version")
   end
 end

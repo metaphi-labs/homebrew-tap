@@ -1,5 +1,5 @@
 name: formula
-# Formula/metaphi.rb follows the latest release of metaphi-labs/metaphi-ai-cli: its binaries and their checksums.
+# Formula/kennet.rb follows the latest release of metaphi-labs/metaphi-ai-cli: its binaries and their checksums.
 # Read from the public release, written with this repository's own token, so no other repository holds a key here.
 # scripts/formula.py validates the tag and every checksum and fills a fixed template; the tarballs must match
 # checksums.txt and, from 0.1.2 on, carry a build provenance attestation from the CLI's release workflow.
@@ -31,7 +31,7 @@ jobs:
             echo "::error::latest release tag is not vX.Y.Z"; exit 1
           fi
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
-          if grep -qF "/releases/download/$tag/" Formula/metaphi.rb && git diff --quiet; then
+          if grep -qF "/releases/download/$tag/" Formula/kennet.rb && git diff --quiet; then
             echo "current=true" >> "$GITHUB_OUTPUT"
           fi
       - name: download and verify the release
@@ -43,14 +43,14 @@ jobs:
           v=${TAG#v}
           dir=$(mktemp -d) && echo "RELEASE_DIR=$dir" >> "$GITHUB_ENV"
           gh release download "$TAG" --repo metaphi-labs/metaphi-ai-cli --dir "$dir" \
-            --pattern checksums.txt --pattern "metaphi_${v}_*.tar.gz"
+            --pattern checksums.txt --pattern "kennet_${v}_*.tar.gz"
           for p in darwin-arm64 darwin-x86_64 linux-arm64 linux-x86_64; do
-            test -f "$dir/metaphi_${v}_${p}.tar.gz" || { echo "::error::release $TAG has no $p tarball"; exit 1; }
+            test -f "$dir/kennet_${v}_${p}.tar.gz" || { echo "::error::release $TAG has no $p tarball"; exit 1; }
           done
           (cd "$dir" && sha256sum --check --strict checksums.txt)
           # 0.1.1 and earlier were released before the CLI attested its builds.
           if [ "$(printf '%s\n' 0.1.1 "$v" | sort -V | tail -1)" != 0.1.1 ]; then
-            for f in "$dir"/checksums.txt "$dir"/metaphi_"${v}"_*.tar.gz; do
+            for f in "$dir"/checksums.txt "$dir"/kennet_"${v}"_*.tar.gz; do
               gh attestation verify "$f" --repo metaphi-labs/metaphi-ai-cli \
                 --signer-workflow metaphi-labs/metaphi-ai-cli/.github/workflows/release.yml \
                 --source-ref "refs/tags/$TAG"
@@ -62,7 +62,7 @@ jobs:
         if: steps.release.outputs.current != 'true'
         env:
           TAG: ${{ steps.release.outputs.tag }}
-        run: python3 scripts/formula.py "$TAG" "$RELEASE_DIR/checksums.txt" Formula/metaphi.rb
+        run: python3 scripts/formula.py "$TAG" "$RELEASE_DIR/checksums.txt" Formula/kennet.rb
       - name: commit when it changed
         if: steps.release.outputs.current != 'true'
         env:
@@ -70,4 +70,4 @@ jobs:
         run: |
           git diff --quiet && exit 0
           git config user.name "metaphi-release" && git config user.email "agent@metaphi.ai"
-          git add Formula/metaphi.rb && git commit -m "metaphi ${TAG#v}" && git push
+          git add Formula/kennet.rb && git commit -m "kennet ${TAG#v}" && git push

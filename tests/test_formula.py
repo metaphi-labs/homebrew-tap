@@ -11,19 +11,19 @@ SHAS = {p: f"{i:x}" * 64 for i, p in enumerate(formula.PLATFORMS, start=10)}
 
 def sums(version="1.2.3", shas=None, extra=""):
     shas = SHAS if shas is None else shas
-    return "".join(f"{s}  metaphi_{version}_{p}.tar.gz\n" for p, s in shas.items()) + extra
+    return "".join(f"{s}  kennet_{version}_{p}.tar.gz\n" for p, s in shas.items()) + extra
 
 
 class Render(unittest.TestCase):
     def test_a_good_release_renders_every_platform(self):
         rb = formula.render("v1.2.3", sums())
         for p, s in SHAS.items():
-            self.assertIn(f"/releases/download/v1.2.3/metaphi_1.2.3_{p}.tar.gz", rb)
+            self.assertIn(f"/releases/download/v1.2.3/kennet_1.2.3_{p}.tar.gz", rb)
             self.assertIn(f'sha256 "{s}"', rb)
         self.assertNotIn("@", rb.replace("#{bin}", ""))
 
     def test_other_files_in_checksums_are_ignored(self):
-        rb = formula.render("v1.2.3", sums(extra=f"{'0' * 64}  metaphi_1.2.3_windows-x86_64.zip\n"))
+        rb = formula.render("v1.2.3", sums(extra=f"{'0' * 64}  kennet_1.2.3_windows-x86_64.zip\n"))
         self.assertNotIn("windows", rb)
 
     def test_bad_tags_are_refused(self):
@@ -48,10 +48,10 @@ class Render(unittest.TestCase):
 
     def test_a_platform_listed_twice_is_refused(self):
         with self.assertRaisesRegex(formula.Invalid, "twice"):
-            formula.render("v1.2.3", sums(extra=f"{'0' * 64}  metaphi_1.2.3_linux-arm64.tar.gz\n"))
+            formula.render("v1.2.3", sums(extra=f"{'0' * 64}  kennet_1.2.3_linux-arm64.tar.gz\n"))
 
     def test_the_committed_formula_is_what_the_script_writes(self):
-        rb = (Path(__file__).resolve().parents[1] / "Formula" / "metaphi.rb").read_text()
+        rb = (Path(__file__).resolve().parents[1] / "Formula" / "kennet.rb").read_text()
         self.assertTrue(rb.startswith(formula.TEMPLATE.split("@URL@")[0]))
 
 
