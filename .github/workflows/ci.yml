@@ -18,7 +18,7 @@ jobs:
       - name: brew style and audit
         run: |
           brew style metaphi-labs/tap
-          brew audit --strict --formula metaphi-labs/tap/metaphi
+          brew audit --strict --formula metaphi-labs/tap/kennet
 
   workflows:
     runs-on: ubuntu-latest

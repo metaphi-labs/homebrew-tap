@@ -1,6 +1,6 @@
-"""Write Formula/metaphi.rb from a release tag and its checksums.txt.
+"""Write Formula/kennet.rb from a release tag and its checksums.txt.
 
-    python3 scripts/formula.py <tag> <checksums.txt> <Formula/metaphi.rb>
+    python3 scripts/formula.py <tag> <checksums.txt> <Formula/kennet.rb>
 
 Every value that reaches the Ruby file is validated first: the tag is vX.Y.Z, each checksum is 64 lowercase hex
 characters, and all four platforms must be present exactly once. The formula is a fixed template; values are
@@ -16,8 +16,8 @@ PLATFORMS = ("darwin-arm64", "darwin-x86_64", "linux-arm64", "linux-x86_64")
 TAG = re.compile(r"v(\d+\.\d+\.\d+)")
 SHA = re.compile(r"[0-9a-f]{64}")
 
-TEMPLATE = '''class Metaphi < Formula
-  desc "Command-line interface for Metaphi AI"
+TEMPLATE = '''class Kennet < Formula
+  desc "Command-line interface for Kennet, the RL infrastructure of Metaphi AI"
   homepage "https://docs.metaphi.ai"
   license "Apache-2.0"
 
@@ -44,11 +44,11 @@ TEMPLATE = '''class Metaphi < Formula
   end
 
   def install
-    bin.install "metaphi"
+    bin.install "kennet"
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/metaphi --version")
+    assert_match version.to_s, shell_output("#{bin}/kennet --version")
   end
 end
 '''
@@ -76,7 +76,7 @@ def checksums(text: str, version: str) -> dict[str, str]:
             raise Invalid(f"unreadable checksums line: {line!r}")
         sha, name = parts[0], parts[1].lstrip("*")
         for platform in PLATFORMS:
-            if name == f"metaphi_{version}_{platform}.tar.gz":
+            if name == f"kennet_{version}_{platform}.tar.gz":
                 if not SHA.fullmatch(sha):
                     raise Invalid(f"checksum for {platform} is not 64 lowercase hex characters")
                 if platform in found:
@@ -91,7 +91,7 @@ def checksums(text: str, version: str) -> dict[str, str]:
 def render(tag: str, checksums_text: str) -> str:
     version = version_of(tag)
     shas = checksums(checksums_text, version)
-    out = TEMPLATE.replace("@URL@", f"https://github.com/{REPO}/releases/download/{tag}/metaphi_{version}")
+    out = TEMPLATE.replace("@URL@", f"https://github.com/{REPO}/releases/download/{tag}/kennet_{version}")
     for platform, sha in shas.items():
         out = out.replace(f"@SHA_{platform}@", sha)
     if "@" in out.replace("#{bin}", ""):
