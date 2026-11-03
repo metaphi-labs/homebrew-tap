@@ -11,7 +11,7 @@ import re
 import sys
 from pathlib import Path
 
-REPO = "metaphi-labs/metaphi-ai-cli"
+REPO = "metaphi-labs/kennet-cli"
 PLATFORMS = ("darwin-arm64", "darwin-x86_64", "linux-arm64", "linux-x86_64")
 TAG = re.compile(r"v(\d+\.\d+\.\d+)")
 SHA = re.compile(r"[0-9a-f]{64}")
