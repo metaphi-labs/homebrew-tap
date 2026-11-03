@@ -5,23 +5,23 @@ class Kennet < Formula
 
   on_macos do
     on_arm do
-      url "https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/v0.1.25/kennet_0.1.25_darwin-arm64.tar.gz"
-      sha256 "edd571dad970a37bfd26327332d234a4b57b4002e76da4358910a83c7c8e2349"
+      url "https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/v0.1.27/kennet_0.1.27_darwin-arm64.tar.gz"
+      sha256 "fe3ac1863b5de87fe3da0599a042d4575bad94b2fcc6071e1e34a08b0c1207f7"
     end
     on_intel do
-      url "https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/v0.1.25/kennet_0.1.25_darwin-x86_64.tar.gz"
-      sha256 "06cb9ac98ad0426a3cf2863b9a1512396c3ee8a19d8adb3d7e375450c70881bb"
+      url "https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/v0.1.27/kennet_0.1.27_darwin-x86_64.tar.gz"
+      sha256 "d3fdd8f1fb062f95728bfb9c9cceca1ccc8ef7c097a4bf04b80e69b6b2263437"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/v0.1.25/kennet_0.1.25_linux-arm64.tar.gz"
-      sha256 "f551529159d45e3b1398bdccc4644383cbf4f49eaf425f10c6c031bc00c49d58"
+      url "https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/v0.1.27/kennet_0.1.27_linux-arm64.tar.gz"
+      sha256 "904d869daa5fde88fabdbee706b76873e276bc2442ca5890a08b8a8d7e01e65c"
     end
     on_intel do
-      url "https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/v0.1.25/kennet_0.1.25_linux-x86_64.tar.gz"
-      sha256 "8258c08906177af5ef1da9cc76ca420e6974f262d7e72cc9859f5ff71e32a024"
+      url "https://github.com/metaphi-labs/metaphi-ai-cli/releases/download/v0.1.27/kennet_0.1.27_linux-x86_64.tar.gz"
+      sha256 "17fb248d9b7a1466751d0fb16633e82a6d85e46ccfb7f226d4bf362647d6daba"
     end
   end
 
